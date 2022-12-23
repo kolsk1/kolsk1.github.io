@@ -1,51 +1,299 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<title> Declaration (For Beatriz)</title>
-		<style type="text/css">
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Password Protected Page</title>
+    <style>
+        html, body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        #dialogText {
+            color: white;
+            background-color: #333333;
+        }
+        
+        #dialogWrap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: table;
+            background-color: #EEEEEE;
+        }
+        
+        #dialogWrapCell {
+            display: table-cell;
+            text-align: center;
+            vertical-align: middle;
+        }
+        
+        #mainDialog {
+            max-width: 400px;
+            margin: 5px;
+            border: solid #AAAAAA 1px;
+            border-radius: 10px;
+            box-shadow: 3px 3px 5px 3px #AAAAAA;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: #FFFFFF;
+            overflow: hidden;
+            text-align: left;
+        }
+        #mainDialog > * {
+            padding: 10px 30px;
+        }
+        #passArea {
+            padding: 20px 30px;
+            background-color: white;
+        }
+        #passArea > * {
+            margin: 5px auto;
+        }
+        #pass {
+            width: 100%;
+            height: 40px;
+            font-size: 30px;
+        }
+        
+        #messageWrapper {
+            float: left;
+            vertical-align: middle;
+            line-height: 30px;
+        }
+        
+        .notifyText {
+            display: none;
+        }
+        
+        #invalidPass {
+            color: red;
+        }
+        
+        #success {
+            color: green;
+        }
+        
+        #submitPass {
+            font-size: 20px;
+            border-radius: 5px;
+            background-color: #E7E7E7;
+            border: solid gray 1px;
+            float: right;
+            cursor: pointer;
+        }
+        #contentFrame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #attribution {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            padding: 10px;
+            font-weight: bold;
+            font-size: 0.8em;
+        }
+        #attribution, #attribution a {
+            color: #999;
+        }
+        .error {
+            display: none;
+            color: red;
+        }
+    </style>
+  </head>
+  <body>
+    <iframe id="contentFrame" frameBorder="0" allowfullscreen></iframe>
+    <div id="dialogWrap">
+        <div id="dialogWrapCell">
+            <div id="mainDialog">
+                <div id="dialogText">This page is password protected.</div>
+                <div id="passArea">
+                    <p id="passwordPrompt">Password</p>
+                    <input id="pass" type="password" name="pass" autofocus>
+                    <div>
+                        <span id="messageWrapper">
+                            <span id="invalidPass" class="error">Sorry, please try again.</span>
+                            <span id="trycatcherror" class="error">Sorry, something went wrong.</span>
+                            <span id="success" class="notifyText">Success!</span>
+                            &nbsp;
+                        </span>
+                        <button id="submitPass" type="button">Submit</button>
+                        <div style="clear: both;"></div>
+                    </div>
+                </div>
+                <div id="securecontext" class="error">
+                    <p>
+                        Sorry, but password protection only works over a secure connection. Please load this page via HTTPS.
+                    </p>
+                </div>
+                <div id="nocrypto" class="error">
+                    <p>
+                        Your web browser appears to be outdated. Please visit this page using a modern browser.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="attribution">
+        Protected by <a href="https://www.maxlaumeister.com/pagecrypt/">PageCrypt</a>
+    </div>
+    <script>
+    (function() {
 
-			body {
-				margin-top: 100px;
-				padding: 0;
-				background-color: #FFF0DB;
-			}
+        var pl = "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";
+        
+        var submitPass = document.getElementById('submitPass');
+        var passEl = document.getElementById('pass');
+        var invalidPassEl = document.getElementById('invalidPass');
+        var trycatcherror = document.getElementById('trycatcherror');
+        var successEl = document.getElementById('success');
+        var contentFrame = document.getElementById('contentFrame');
+        
+        // Sanity checks
 
-			p {
-				margin-top: 100px;
-				margin-left: 30px;
-				margin-right: 30px;
-				font-family: Courier New;
-				font-size: 20pt;
-				text-align: center;
-			}
+        if (pl === "") {
+            submitPass.disabled = true;
+            passEl.disabled = true;
+            alert("This page is meant to be used with the encryption tool. It doesn't work standalone.");
+            return;
+        }
 
-			#player {
- 				width: 50%;
-			}
+        if (!isSecureContext) {
+            document.querySelector("#passArea").style.display = "none";
+            document.querySelector("#securecontext").style.display = "block";
+            return;
+        }
 
-		</style>
-	</head>
-	<body>
-		<div>
-    		<audio id="player" controls style="margin: 0 auto; display: block;">
-    			<source src="audio/caroline.mp3" type="audio/mpeg">
-    		</audio>
-		</div>
+        if (!crypto.subtle) {
+            document.querySelector("#passArea").style.display = "none";
+            document.querySelector("#nocrypto").style.display = "block";
+            return;
+        }
+        
+        function str2ab(str) {
+            var ustr = atob(str);
+            var buf = new ArrayBuffer(ustr.length);
+            var bufView = new Uint8Array(buf);
+            for (var i=0, strLen=ustr.length; i < strLen; i++) {
+                bufView[i] = ustr.charCodeAt(i);
+            }
+            return bufView;
+        }
 
-		<p>
-			Eu vou tentar não ser prolixo mas não garanto nada.</br></br>
+        async function deriveKey(salt, password) {
+            const encoder = new TextEncoder()
+            const baseKey = await crypto.subtle.importKey(
+                'raw',
+                encoder.encode(password),
+                'PBKDF2',
+                false,
+                ['deriveKey'],
+            )
+            return await crypto.subtle.deriveKey(
+                { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+                baseKey,
+                { name: 'AES-GCM', length: 256 },
+                true,
+                ['decrypt'],
+            )
+        }
+        
+        async function doSubmit(evt) {
+            submitPass.disabled = true;
+            passEl.disabled = true;
 
-			Tu deve saber que alguns meses atrás eu fui até o teu prédio e deixei uma carta pra tua irmã, onde eu demonstrei interesse por ela. Logicamente, existia um fundo de verdade nisso, mas eu não fui completamente honesto. No dia em que eu te vi no começo desse ano, lá na federal, foi o dia que eu decidi finalmente falar alguma coisa. Eu já tinha teu instagram há muito tempo, só nunca tinha tido coragem de dizer nada. Fazia muito tempo desde que a gente tinha se visto.</br></br>
+            let iv, ciphertext, key;
+            
+            try {
+                var unencodedPl = str2ab(pl);
 
-			Eventualmente no meio da nossa conversa tu mencionou que tinha um namorado, e isso me impediu de fazer o que eu ia eventualmente fazer: te chamar pra sair. </br></br>
+                const salt = unencodedPl.slice(0, 32)
+                iv = unencodedPl.slice(32, 32 + 16)
+                ciphertext = unencodedPl.slice(32 + 16)
 
-			Você foi a melhor e provavelmente única amiga que eu tive. Eu ainda me lembro como se fosse hoje um dia na aula de biologia de Márcio, quando ele mostrou a foto de um peixe muito esquisito e eu fiquei brincando dizendo que tu parecia com ele (Não parecia). Eu sempre te achei uma pessoa incrível, mas naquela época eu não tinha muita noção de nada. Ainda não tenho na verdade, mas eu sei que tenho mais.</br></br>
+                key = await deriveKey(salt, passEl.value);
+            } catch (e) {
+                trycatcherror.style.display = "inline";
+                console.error(e);
+                return;
+            }
 
-			Então, um pouco frustrado com a realidade da situação, eu resolvi tentar alguma coisa com Bianca. A proximidade entre vocês duas enganou minha cabeça, eu acho. Esses últimos anos têm sido especialmente difíceis pra mim e algumas coisas me afetam mais do que deveriam. Solidão sendo uma delas. Eu realmente acho tudo que eu escrevi pra ela, mas se eu for ser honesto comigo mesmo, enquanto eu escrevia eu tava pensando em você. Eu te reconheci quando tu passou por mim naquele dia porque o teu rosto tá gravado na minha memória, e eu não conseguiria tirar nem se eu tentasse. Assim como o teu prédio, e assim como o mês do teu aniversário, fevereiro. (Por favor, cérebro, não me deixe na mão, eu tenho 95% de certeza que é em fevereiro).</br></br>
+            try {
+                const decryptedArray = new Uint8Array(
+                    await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext)
+                );
 
-			Eu gosto de tu, Bia.</br></br>
+                let decrypted = new TextDecoder().decode(decryptedArray);
 
-			Se isso for muito confuso ou parecer estranho, é porque é mesmo, eu infelizmente compliquei as coisas mais do que deveria. Eu não sei como está tua cabeça agora, nem se tu já tás vendo alguém. Eu só quis ter a chance de dizer o que eu não consegui antes. Meu pai uma vez me falou: “Paciência é esperar por uma coisa que pode nunca chegar.”</br>
-		</p>
-	</body>
-</html> 
+                if (decrypted === "") throw "No data returned";
+
+                const basestr = '<base href="." target="_top">';
+                const anchorfixstr = `
+                    <script>
+                        Array.from(document.links).forEach((anchor) => {
+                            const href = anchor.getAttribute("href");
+                            if (href.startsWith("#")) {
+                                anchor.addEventListener("click", function(e) {
+                                    e.preventDefault();
+                                    const targetId = this.getAttribute("href").substring(1);
+                                    const targetEl = document.getElementById(targetId);
+                                    targetEl.scrollIntoView();
+                                });
+                            }
+                        });
+                    <\/script>
+                `;
+                
+                // Set default iframe link targets to _top so all links break out of the iframe
+                if (decrypted.includes("<head>")) decrypted = decrypted.replace("<head>", "<head>" + basestr);
+                else if (decrypted.includes("<!DOCTYPE html>")) decrypted = decrypted.replace("<!DOCTYPE html>", "<!DOCTYPE html>" + basestr);
+                else decrypted = basestr + decrypted;
+
+                // Fix fragment links
+                if (decrypted.includes("</body>")) decrypted = decrypted.replace("</body>", anchorfixstr + '</body>');
+                else if (decrypted.includes("</html>")) decrypted = decrypted.replace("</html>", anchorfixstr + '</html>');
+                else decrypted = decrypted + anchorfixstr;
+                
+                contentFrame.srcdoc = decrypted;
+                
+                successEl.style.display = "inline";
+                setTimeout(function() {
+                    dialogWrap.style.display = "none";
+                }, 1000);
+            } catch (e) {
+                invalidPassEl.style.display = "inline";
+                passEl.value = "";
+                submitPass.disabled = false;
+                passEl.disabled = false;
+                console.error(e);
+                return;
+            }
+        }
+        
+        submitPass.onclick = doSubmit;
+        passEl.onkeypress = function(e){
+            if (!e) e = window.event;
+            var keyCode = e.keyCode || e.which;
+            invalidPassEl.style.display = "none";
+            if (keyCode == '13'){
+              // Enter pressed
+              doSubmit();
+              return false;
+            }
+        }
+    })();
+    </script>
+  </body>
+</html>
